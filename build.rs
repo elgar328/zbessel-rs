@@ -2,7 +2,7 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    // C++ 소스 파일들을 컴파일합니다
+    // Compile C++ source files
     cc::Build::new()
         .cpp(true)
         .file("zbessel.cc")
@@ -15,16 +15,16 @@ fn main() {
         .flag("-w")
         .compile("zbessel");
 
-    // bindgen을 사용하여 Rust 바인딩을 생성합니다
+    // Generate Rust bindings using bindgen
     let bindings = bindgen::Builder::default()
         .header("zbessel.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .generate()
-        .expect("바인딩 생성에 실패했습니다");
+        .expect("Failed to generate bindings");
 
-    // 생성된 바인딩을 OUT_DIR에 저장합니다
+    // Save the generated bindings to OUT_DIR
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
         .write_to_file(out_path.join("bindings.rs"))
-        .expect("바인딩을 파일에 쓰는데 실패했습니다!");
+        .expect("Failed to write bindings to file!");
 }
