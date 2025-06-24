@@ -33,11 +33,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let z = Complex64::new(1.0, 0.5);
     
     // 베셀 함수들
-    let j0 = J(z, 0.0)?;  // J_0(z)
-    let j1 = J(z, 1.0)?;  // J_1(z)
-    let y0 = Y(z, 0.0)?;  // Y_0(z)
-    let i0 = I(z, 0.0)?;  // I_0(z)
-    let k0 = K(z, 0.0)?;  // K_0(z)
+    let j0 = J(0.0, z)?;  // J_0(z)
+    let j1 = J(1.0, z)?;  // J_1(z)
+    let y0 = Y(0.0, z)?;  // Y_0(z)
+    let i0 = I(0.0, z)?;  // I_0(z)
+    let k0 = K(0.0, z)?;  // K_0(z)
     
     // 에어리 함수들
     let ai_val = Ai(z)?;  // Ai(z)
@@ -85,7 +85,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## API 참조
 
-### 베셀 함수
+### 간단한 API
+
+#### `J(nu, z) -> Result<Complex64, BesselError>`
+베셀 함수 J_ν(z)를 계산합니다 (단일 값, 스케일링 없음).
+
+- `nu`: 차수 (실수)
+- `z`: 복소수 인수
+
+#### `Y(nu, z) -> Result<Complex64, BesselError>`
+베셀 함수 Y_ν(z)를 계산합니다 (단일 값, 스케일링 없음).
+
+#### `I(nu, z) -> Result<Complex64, BesselError>`
+수정 베셀 함수 I_ν(z)를 계산합니다 (단일 값, 스케일링 없음).
+
+#### `K(nu, z) -> Result<Complex64, BesselError>`
+수정 베셀 함수 K_ν(z)를 계산합니다 (단일 값, 스케일링 없음).
+
+#### `Ai(z) -> Result<Complex64, BesselError>`
+에어리 함수 Ai(z)를 계산합니다 (스케일링 없음).
+
+#### `Bi(z) -> Result<Complex64, BesselError>`
+에어리 함수 Bi(z)를 계산합니다 (스케일링 없음).
+
+### 고급 API
 
 #### `bessel_j(z, nu, kode, n) -> Result<BesselResult, BesselError>`
 복소수 베셀 함수 J_ν(z)를 계산합니다.
@@ -121,11 +144,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### 라이브러리 빌드
 ```bash
 cargo build
-```
-
-### 예제 실행
-```bash
-cargo run --bin example
 ```
 
 ### 테스트 실행

@@ -1,3 +1,66 @@
+//! # zbessel-rs
+//!
+//! Rust에서 복소수 베셀 함수와 에어리 함수를 사용할 수 있게 해주는 라이브러리입니다.
+//!
+//! ## 간단한 사용법
+//!
+//! ```rust
+//! use num_complex::Complex64;
+//! use zbessel_rs::{J, Y, I, K, Ai, Bi};
+//!
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let z = Complex64::new(1.0, 0.5);
+//!     
+//!     // 베셀 함수들 (차수, 변수 순서)
+//!     let j0 = J(0.0, z)?;  // J_0(z)
+//!     let j1 = J(1.0, z)?;  // J_1(z)
+//!     let y0 = Y(0.0, z)?;  // Y_0(z)
+//!     let i0 = I(0.0, z)?;  // I_0(z)
+//!     let k0 = K(0.0, z)?;  // K_0(z)
+//!     
+//!     // 에어리 함수들
+//!     let ai_val = Ai(z)?;  // Ai(z)
+//!     let bi_val = Bi(z)?;  // Bi(z)
+//!     
+//!     println!("J_0({}) = {}", z, j0);
+//!     println!("Y_0({}) = {}", z, y0);
+//!     println!("I_0({}) = {}", z, i0);
+//!     println!("K_0({}) = {}", z, k0);
+//!     println!("Ai({}) = {}", z, ai_val);
+//!     println!("Bi({}) = {}", z, bi_val);
+//!     
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ## 고급 사용법
+//!
+//! 다중 값 계산이나 스케일링이 필요한 경우:
+//!
+//! ```rust
+//! use num_complex::Complex64;
+//! use zbessel_rs::{bessel_j, bessel_i, airy_ai};
+//!
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let z = Complex64::new(2.0, 1.0);
+//!     
+//!     // 여러 차수를 한 번에 계산: J_0(z), J_1(z), J_2(z)
+//!     let result = bessel_j(z, 0.0, 1, 3)?;
+//!     for (n, value) in result.values.iter().enumerate() {
+//!         println!("J_{}({}) = {}", n, z, value);
+//!     }
+//!     
+//!     // 스케일링된 결과 (kode=2)
+//!     let scaled = bessel_i(z, 0.0, 2, 1)?;
+//!     println!("I_0({}) (scaled) = {}", z, scaled.values[0]);
+//!     
+//!     // 에어리 함수의 도함수 (id=1)
+//!     let ai_prime = airy_ai(z, 1, 1)?;
+//!     println!("Ai'({}) = {}", z, ai_prime);
+//!     
+//!     Ok(())
+//! }
+
 use num_complex::Complex64;
 use std::os::raw::{c_double, c_int};
 
@@ -308,13 +371,13 @@ pub fn airy_bi(z: Complex64, id: i32, kode: i32) -> Result<Complex64, BesselErro
 /// 베셀 함수 J_ν(z)를 계산합니다 (단일 값, 스케일링 없음)
 ///
 /// # 매개변수
-/// * `z` - 복소수 인수
 /// * `nu` - 차수 (실수)
+/// * `z` - 복소수 인수
 ///
 /// # 반환값
 /// J_ν(z)의 복소수 값
 #[allow(non_snake_case)]
-pub fn J(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
+pub fn J(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
     let result = bessel_j(z, nu, 1, 1)?;
     Ok(result.values[0])
 }
@@ -322,13 +385,13 @@ pub fn J(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
 /// 베셀 함수 Y_ν(z)를 계산합니다 (단일 값, 스케일링 없음)
 ///
 /// # 매개변수
-/// * `z` - 복소수 인수
 /// * `nu` - 차수 (실수)
+/// * `z` - 복소수 인수
 ///
 /// # 반환값
 /// Y_ν(z)의 복소수 값
 #[allow(non_snake_case)]
-pub fn Y(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
+pub fn Y(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
     let result = bessel_y(z, nu, 1, 1)?;
     Ok(result.values[0])
 }
@@ -336,13 +399,13 @@ pub fn Y(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
 /// 수정 베셀 함수 I_ν(z)를 계산합니다 (단일 값, 스케일링 없음)
 ///
 /// # 매개변수
-/// * `z` - 복소수 인수
 /// * `nu` - 차수 (실수)
+/// * `z` - 복소수 인수
 ///
 /// # 반환값
 /// I_ν(z)의 복소수 값
 #[allow(non_snake_case)]
-pub fn I(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
+pub fn I(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
     let result = bessel_i(z, nu, 1, 1)?;
     Ok(result.values[0])
 }
@@ -350,13 +413,13 @@ pub fn I(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
 /// 수정 베셀 함수 K_ν(z)를 계산합니다 (단일 값, 스케일링 없음)
 ///
 /// # 매개변수
-/// * `z` - 복소수 인수
 /// * `nu` - 차수 (실수)
+/// * `z` - 복소수 인수
 ///
 /// # 반환값
 /// K_ν(z)의 복소수 값
 #[allow(non_snake_case)]
-pub fn K(z: Complex64, nu: f64) -> Result<Complex64, BesselError> {
+pub fn K(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
     let result = bessel_k(z, nu, 1, 1)?;
     Ok(result.values[0])
 }
@@ -410,14 +473,14 @@ mod tests {
     #[test]
     fn test_simple_j() {
         let z = Complex64::new(1.0, 0.5);
-        let result = J(z, 0.0).unwrap();
+        let result = J(0.0, z).unwrap();
         assert!(result.norm() > 0.0);
     }
 
     #[test]
     fn test_simple_i() {
         let z = Complex64::new(1.0, 0.5);
-        let result = I(z, 0.0).unwrap();
+        let result = I(0.0, z).unwrap();
         assert!(result.norm() > 0.0);
     }
 
