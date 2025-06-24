@@ -1,0 +1,16 @@
+[package]
+name = "zbessel-rs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "zbessel_rs"
+crate-type = ["lib"]
+
+
+[dependencies]
+num-complex = "0.4"
+
+[build-dependencies]
+bindgen = "0.70"
+cc = "1.0"
