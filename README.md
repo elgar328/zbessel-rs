@@ -1,13 +1,15 @@
 # zbessel-rs
 
-A library that provides complex Bessel functions and Airy functions for Rust. This library is a Rust binding for the C++ zbessel library, which is based on the original Fortran 77 implementation designed and implemented by D.E. Amos.
+A Rust binding for the [zbessel](https://github.com/jpcima/zbessel) library that provides complex Bessel functions and Airy functions. This library is based on the original Fortran 77 implementation designed and implemented by D.E. Amos, which is part of the SLATEC mathematical library.
 
-## Key Features
+## Features
 
 - **Complex Bessel Functions**: J_ν(z), Y_ν(z), I_ν(z), K_ν(z)
 - **Complex Airy Functions**: Ai(z), Bi(z)
 - **Safe Rust API**: Error handling using Result types
 - **Auto Build**: Automatic C binding generation using bindgen
+- **Thread-safe**: Based on the original library's stateless design
+- **No Runtime Dependencies**: No f2c or gfortran runtime dependencies
 
 ## Installation
 
@@ -15,8 +17,8 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-zbessel-rs = { git = "https://github.com/elgar328/zbessel-rs.git" }
-num-complex = "0.4"
+zbessel-rs = "0.1"
+num-complex = "^0.4"
 ```
 
 ## Usage
@@ -139,47 +141,6 @@ Calculate complex Airy function Ai(z).
 #### `airy_bi(z, id, kode) -> Result<Complex64, BesselError>`
 Calculate complex Airy function Bi(z).
 
-## Build and Run
-
-### Build Library
-```bash
-cargo build
-```
-
-### Run Tests
-```bash
-cargo test
-```
-
-## Data Types
-
-### `BesselResult`
-```rust
-pub struct BesselResult {
-    /// Calculated function values
-    pub values: Vec<Complex64>,
-    /// Number of function values that experienced underflow
-    pub underflow_count: i32,
-}
-```
-
-### `BesselError`
-```rust
-pub enum BesselError {
-    /// Invalid input parameters
-    InvalidParameter(String),
-    /// Computation error
-    ComputationError(String),
-}
-```
-
-## Original Library Information
-
-This Rust binding is based on:
-- **Original Implementation**: D.E. Amos's Fortran 77 implementation (part of the SLATEC mathematical library)
-- **C++ Port**: Modern C++ implementation based on f2c conversion
-- **Features**: Thread-safe, no f2c/gfortran runtime dependencies
-
 ## License
 
-Follows the license of the original zbessel library. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 

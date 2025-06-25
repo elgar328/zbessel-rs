@@ -2,6 +2,13 @@
 name = "zbessel-rs"
 version = "0.1.0"
 edition = "2021"
+authors = ["elgar328 <cork_unsold_0k@icloud.com>"]
+description = "A Rust binding for the zbessel library providing complex Bessel functions and Airy functions"
+license = "MIT"
+repository = "https://github.com/elgar328/zbessel-rs"
+keywords = ["bessel", "complex", "mathematics", "special-functions", "airy"]
+categories = ["science", "mathematics"]
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
