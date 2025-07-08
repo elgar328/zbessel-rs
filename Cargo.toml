@@ -1,6 +1,6 @@
 [package]
 name = "zbessel-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["elgar328 <cork_unsold_0k@icloud.com>"]
 description = "A Rust binding for the zbessel library providing complex Bessel functions and Airy functions"
