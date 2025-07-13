@@ -6,7 +6,7 @@
 //!
 //! ```rust
 //! use num_complex::Complex64;
-//! use zbessel_rs::{J, Y, I, K, Ai, Bi};
+//! use zbessel_rs::{J, Y, I, K, Ai, Bi, J_scaled, Y_scaled, I_scaled, K_scaled, Ai_scaled, Bi_scaled};
 //!
 //! fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let z = Complex64::new(1.0, 0.5);
@@ -22,12 +22,21 @@
 //!     let ai_val = Ai(z)?;  // Ai(z)
 //!     let bi_val = Bi(z)?;  // Bi(z)
 //!     
+//!     // Scaled versions (useful for large arguments)
+//!     let j0_scaled = J_scaled(0.0, z)?;  // J_0(z) with scaling
+//!     let i0_scaled = I_scaled(0.0, z)?;  // I_0(z) with scaling
+//!     let ai_scaled = Ai_scaled(z)?;      // Ai(z) with scaling
+//!     
 //!     println!("J_0({}) = {}", z, j0);
 //!     println!("Y_0({}) = {}", z, y0);
 //!     println!("I_0({}) = {}", z, i0);
 //!     println!("K_0({}) = {}", z, k0);
 //!     println!("Ai({}) = {}", z, ai_val);
 //!     println!("Bi({}) = {}", z, bi_val);
+//!     
+//!     println!("J_0({}) (scaled) = {}", z, j0_scaled);
+//!     println!("I_0({}) (scaled) = {}", z, i0_scaled);
+//!     println!("Ai({}) (scaled) = {}", z, ai_scaled);
 //!     
 //!     Ok(())
 //! }
@@ -305,7 +314,7 @@ pub fn bessel_k(z: Complex64, nu: f64, kode: i32, n: usize) -> Result<BesselResu
 /// # Parameters
 /// * `z` - Complex argument
 /// * `id` - Differentiation option (0: Ai(z), 1: Ai'(z))
-/// * `kode` - Scaling option (1: no scaling, 2: exp(|Re(z)|*2/3) scaling)
+/// * `kode` - Scaling option (1: no scaling, 2: exp(zeta) scaling where zeta=(2/3)*z^(3/2))
 pub fn airy_ai(z: Complex64, id: i32, kode: i32) -> Result<Complex64, BesselError> {
     let mut air = 0.0;
     let mut aii = 0.0;
@@ -338,7 +347,7 @@ pub fn airy_ai(z: Complex64, id: i32, kode: i32) -> Result<Complex64, BesselErro
 /// # Parameters
 /// * `z` - Complex argument
 /// * `id` - Differentiation option (0: Bi(z), 1: Bi'(z))
-/// * `kode` - Scaling option (1: no scaling, 2: exp(-|Re(z)|*2/3) scaling)
+/// * `kode` - Scaling option (1: no scaling, 2: exp(-abs(Re(zeta))) scaling where zeta=(2/3)*z^(3/2))
 pub fn airy_bi(z: Complex64, id: i32, kode: i32) -> Result<Complex64, BesselError> {
     let mut bir = 0.0;
     let mut bii = 0.0;
@@ -448,48 +457,314 @@ pub fn Bi(z: Complex64) -> Result<Complex64, BesselError> {
     airy_bi(z, 0, 1)
 }
 
+// ========================================
+// Scaled single-value calculation functions
+// ========================================
+
+/// Calculate Bessel function J_ν(z) with scaling (single value)
+///
+/// # Parameters
+/// * `nu` - Order (real number)
+/// * `z` - Complex argument
+///
+/// # Returns
+/// Complex value of J_ν(z) with exp(-abs(Im(z))) scaling
+#[allow(non_snake_case)]
+pub fn J_scaled(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
+    let result = bessel_j(z, nu, 2, 1)?;
+    Ok(result.values[0])
+}
+
+/// Calculate Bessel function Y_ν(z) with scaling (single value)
+///
+/// # Parameters
+/// * `nu` - Order (real number)
+/// * `z` - Complex argument
+///
+/// # Returns
+/// Complex value of Y_ν(z) with exp(-abs(Im(z))) scaling
+#[allow(non_snake_case)]
+pub fn Y_scaled(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
+    let result = bessel_y(z, nu, 2, 1)?;
+    Ok(result.values[0])
+}
+
+/// Calculate modified Bessel function I_ν(z) with scaling (single value)
+///
+/// # Parameters
+/// * `nu` - Order (real number)
+/// * `z` - Complex argument
+///
+/// # Returns
+/// Complex value of I_ν(z) with exp(-abs(Re(z))) scaling
+#[allow(non_snake_case)]
+pub fn I_scaled(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
+    let result = bessel_i(z, nu, 2, 1)?;
+    Ok(result.values[0])
+}
+
+/// Calculate modified Bessel function K_ν(z) with scaling (single value)
+///
+/// # Parameters
+/// * `nu` - Order (real number)
+/// * `z` - Complex argument
+///
+/// # Returns
+/// Complex value of K_ν(z) with exp(z) scaling
+#[allow(non_snake_case)]
+pub fn K_scaled(nu: f64, z: Complex64) -> Result<Complex64, BesselError> {
+    let result = bessel_k(z, nu, 2, 1)?;
+    Ok(result.values[0])
+}
+
+/// Calculate Airy function Ai(z) with scaling
+///
+/// # Parameters
+/// * `z` - Complex argument
+///
+/// # Returns
+/// Complex value of Ai(z) with exp(zeta) scaling where zeta=(2/3)*z^(3/2)
+#[allow(non_snake_case)]
+pub fn Ai_scaled(z: Complex64) -> Result<Complex64, BesselError> {
+    airy_ai(z, 0, 2)
+}
+
+/// Calculate Airy function Bi(z) with scaling
+///
+/// # Parameters
+/// * `z` - Complex argument
+///
+/// # Returns
+/// Complex value of Bi(z) with exp(-abs(Re(zeta))) scaling where zeta=(2/3)*z^(3/2)
+#[allow(non_snake_case)]
+pub fn Bi_scaled(z: Complex64) -> Result<Complex64, BesselError> {
+    airy_bi(z, 0, 2)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_bessel_j() {
-        let z = Complex64::new(1.0, 0.5);
-        let result = bessel_j(z, 0.0, 1, 1).unwrap();
-        assert_eq!(result.values.len(), 1);
-        // Basic validity check
-        assert!(result.values[0].norm() > 0.0);
-    }
-
-    #[test]
-    fn test_airy_ai() {
-        let z = Complex64::new(1.0, 0.0);
-        let result = airy_ai(z, 0, 1).unwrap();
-        // Ai(1) ≈ 0.135... (compare with actual value)
-        assert!((result.re - 0.135).abs() < 0.01);
-    }
-
-    // Simple API tests
+    // Simple function tests
     #[test]
     fn test_simple_j() {
-        let z = Complex64::new(1.0, 0.5);
-        let result = J(0.0, z).unwrap();
-        assert!(result.norm() > 0.0);
+        let z = Complex64::new(10.0, 20.0);
+        let nu = 1.0;
+        let result = J(nu, z).unwrap();
+
+        // Expected value
+        let expected = Complex64::new(-1.3869150348751683e7, -3.785203660760742e7);
+
+        let diff = (result - expected).norm();
+        assert!(diff < 1e-8, "J test failed: diff = {}", diff);
+    }
+
+    #[test]
+    fn test_simple_y() {
+        let z = Complex64::new(10.0, 20.0);
+        let nu = 1.0;
+        let result = Y(nu, z).unwrap();
+
+        // Expected value
+        let expected = Complex64::new(3.785203660760742e7, -1.3869150348751685e7);
+
+        let diff = (result - expected).norm();
+        assert!(diff < 1e-8, "Y test failed: diff = {}", diff);
     }
 
     #[test]
     fn test_simple_i() {
-        let z = Complex64::new(1.0, 0.5);
-        let result = I(0.0, z).unwrap();
-        assert!(result.norm() > 0.0);
+        let z = Complex64::new(10.0, 20.0);
+        let nu = 1.0;
+        let result = I(nu, z).unwrap();
+
+        // Expected value
+        let expected = Complex64::new(1509.8283640825061, 1060.1232442308794);
+
+        let diff = (result - expected).norm();
+        assert!(diff < 1e-10, "I test failed: diff = {}", diff);
+    }
+
+    #[test]
+    fn test_simple_k() {
+        let z = Complex64::new(10.0, 20.0);
+        let nu = 1.0;
+        let result = K(nu, z).unwrap();
+
+        // Expected value
+        let expected = Complex64::new(-1.7871627759052974e-6, -1.1993686627062101e-5);
+
+        let diff = (result - expected).norm();
+        assert!(diff < 1e-10, "K test failed: diff = {}", diff);
     }
 
     #[test]
     fn test_simple_ai() {
-        let z = Complex64::new(1.0, 0.0);
+        let z = Complex64::new(10.0, 20.0);
         let result = Ai(z).unwrap();
-        // Ai(1) ≈ 0.135...
-        assert!((result.re - 0.135).abs() < 0.01);
-        assert!(result.im.abs() < 1e-10); // For real input, imaginary part should be close to zero
+
+        // Expected value
+        let expected = Complex64::new(14.71701664241453, -71.3378944410467);
+
+        let diff = (result - expected).norm();
+        assert!(diff < 1e-10, "Ai test failed: diff = {}", diff);
+    }
+
+    #[test]
+    fn test_simple_bi() {
+        let z = Complex64::new(10.0, 20.0);
+        let result = Bi(z).unwrap();
+
+        // Expected value
+        let expected = Complex64::new(71.33821176573869, 14.71735250989695);
+
+        let diff = (result - expected).norm();
+        assert!(diff < 1e-10, "Bi test failed: diff = {}", diff);
+    }
+
+    #[test]
+    fn test_j_scaling_consistency() {
+        let z = Complex64::new(-100.0, 200.0);
+        let nu = 1.0;
+
+        // Calculate using regular J function
+        let j_regular = J(nu, z).unwrap();
+
+        // Calculate using J_scaled function
+        let j_scaled = J_scaled(nu, z).unwrap();
+
+        // For J functions, the scaling factor is exp(-abs(Im(z)))
+        let scale_factor = (-z.im.abs()).exp();
+        let j_regular_scaled = j_regular * scale_factor;
+
+        // Check if J_scaled result matches J result multiplied by scale factor
+        let diff = (j_scaled - j_regular_scaled).norm();
+        assert!(
+            diff < 1e-10,
+            "J scaling consistency failed: diff = {}",
+            diff
+        );
+    }
+
+    #[test]
+    fn test_y_scaling_consistency() {
+        let z = Complex64::new(200.0, -150.0);
+        let nu = 1.0;
+
+        // Calculate using regular Y function
+        let y_regular = Y(nu, z).unwrap();
+
+        // Calculate using Y_scaled function
+        let y_scaled = Y_scaled(nu, z).unwrap();
+
+        // For Y functions, the scaling factor is exp(-abs(Im(z)))
+        let scale_factor = (-z.im.abs()).exp();
+        let y_regular_scaled = y_regular * scale_factor;
+
+        // Check if Y_scaled result matches Y result multiplied by scale factor
+        let diff = (y_scaled - y_regular_scaled).norm();
+        assert!(
+            diff < 1e-10,
+            "Y scaling consistency failed: diff = {}",
+            diff
+        );
+    }
+
+    #[test]
+    fn test_i_scaling_consistency() {
+        let z = Complex64::new(200.0, -100.0);
+        let nu = 1.0;
+
+        // Calculate using regular I function
+        let i_regular = I(nu, z).unwrap();
+
+        // Calculate using I_scaled function
+        let i_scaled = I_scaled(nu, z).unwrap();
+
+        // For I functions, the scaling factor is exp(-abs(Re(z)))
+        let scale_factor = (-z.re.abs()).exp();
+        let i_regular_scaled = i_regular * scale_factor;
+
+        // Check if I_scaled result matches I result multiplied by scale factor
+        let diff = (i_scaled - i_regular_scaled).norm();
+        assert!(
+            diff < 1e-10,
+            "I scaling consistency failed: diff = {}",
+            diff
+        );
+    }
+
+    #[test]
+    fn test_k_scaling_consistency() {
+        let z = Complex64::new(100.0, -50.0);
+        let nu = 1.0;
+
+        // Calculate using regular K function
+        let k_regular = K(nu, z).unwrap();
+
+        // Calculate using K_scaled function
+        let k_scaled = K_scaled(nu, z).unwrap();
+
+        // For K functions, the scaling factor is exp(z)
+        let scale_factor = z.exp();
+        let k_regular_scaled = k_regular * scale_factor;
+
+        // Check if K_scaled result matches K result multiplied by scale factor
+        let diff = (k_scaled - k_regular_scaled).norm();
+        assert!(
+            diff < 1e-10,
+            "K scaling consistency failed: diff = {}",
+            diff
+        );
+    }
+
+    #[test]
+    fn test_ai_scaling_consistency() {
+        let z = Complex64::new(100.0, -50.0);
+
+        // Calculate using regular Ai function
+        let ai_regular = Ai(z).unwrap();
+
+        // Calculate using Ai_scaled function
+        let ai_scaled = Ai_scaled(z).unwrap();
+
+        // For Ai functions, the scaling factor is exp(zeta) where zeta = (2/3)*z^(3/2)
+        let z_sqrt = z.sqrt();
+        let zeta = (2.0 / 3.0) * z * z_sqrt;
+        let scale_factor = zeta.exp();
+        let ai_regular_scaled = ai_regular * scale_factor;
+
+        // Check if Ai_scaled result matches Ai result multiplied by scale factor
+        let diff = (ai_scaled - ai_regular_scaled).norm();
+        assert!(
+            diff < 1e-10,
+            "Ai scaling consistency failed: diff = {}",
+            diff
+        );
+    }
+
+    #[test]
+    fn test_bi_scaling_consistency() {
+        let z = Complex64::new(100.0, -50.0);
+
+        // Calculate using regular Bi function
+        let bi_regular = Bi(z).unwrap();
+
+        // Calculate using Bi_scaled function
+        let bi_scaled = Bi_scaled(z).unwrap();
+
+        // For Bi functions, the scaling factor is exp(-abs(Re(zeta))) where zeta = (2/3)*z^(3/2)
+        let z_sqrt = z.sqrt();
+        let zeta = (2.0 / 3.0) * z * z_sqrt;
+        let scale_factor = (-zeta.re.abs()).exp();
+        let bi_regular_scaled = bi_regular * scale_factor;
+
+        // Check if Bi_scaled result matches Bi result multiplied by scale factor
+        let diff = (bi_scaled - bi_regular_scaled).norm();
+        assert!(
+            diff < 1e-10,
+            "Bi scaling consistency failed: diff = {}",
+            diff
+        );
     }
 }
