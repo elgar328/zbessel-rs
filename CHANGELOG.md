@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2024-12-19
+
+### Added
+- Scaled function variants: `J_scaled`, `Y_scaled`, `I_scaled`, `K_scaled`, `Ai_scaled`, `Bi_scaled`
+- Comprehensive test suite for all functions
+- Platform support documentation (macOS, Windows MSVC/GNU, Linux)
+
+### Changed
+- Renamed "Advanced API" to "Low-level API" for clarity
+- Enhanced README with detailed scaling factor explanations
+- Improved API documentation with zeta parameter clarification
+
+### Deprecated
+- None
+
+### Removed
+- None
+
+### Fixed
+- None
+
+### Security
+- None
+
 ## [0.1.1] - 2024-12-19
 
 ### Added

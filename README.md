@@ -15,7 +15,7 @@ A Rust binding for the [zbessel](https://github.com/jpcima/zbessel) library that
 ## Supported Platforms
 
 - **macOS** (x86_64, aarch64)
-- **Windows** (MSVC)
+- **Windows** (MSVC, GNU/MinGW)
 - **Linux** (x86_64, aarch64)
 
 ## Installation
