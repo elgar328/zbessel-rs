@@ -1,5 +1,10 @@
 # zbessel-rs
 
+
+> **⚠️ This crate is no longer maintained.**
+> Use [complex-bessel](https://github.com/elgar328/complex-bessel) instead — a pure Rust implementation of the same Amos algorithm with no C/Fortran dependencies.
+
+
 A Rust binding for the [zbessel](https://github.com/jpcima/zbessel) library that provides complex Bessel functions and Airy functions. This library is based on the original Fortran 77 implementation designed and implemented by D.E. Amos, which is part of the SLATEC mathematical library.
 
 ## Features
