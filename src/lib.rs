@@ -1,3 +1,5 @@
+#![deprecated(since = "0.1.3", note = "This crate is no longer maintained. Use the `complex-bessel` crate instead.")]
+
 //! # zbessel-rs
 //!
 //! A library that provides complex Bessel functions and Airy functions for Rust.
